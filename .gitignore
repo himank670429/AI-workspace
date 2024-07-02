@@ -1,0 +1,10 @@
+# environment variable and virtual enviroment
+env/
+.env
+
+# test folder
+test/
+
+# python cache
+__pycache__/
+*.pyc
