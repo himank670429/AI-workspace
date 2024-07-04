@@ -50,7 +50,14 @@ def add(arguments):
 def list():
     Ignore.getAll()
 
+@click.command()
+@click.argument('arguments', nargs=-1)
+@click.option("-a", '--all', is_flag=True, help="remove the entire list from .workignore")
+def remove(arguments, all):
+    Ignore.remove(arguments=arguments, all_flag=all)
+
 ignore.add_command(add)
+ignore.add_command(remove)
 ignore.add_command(list)
 
 
