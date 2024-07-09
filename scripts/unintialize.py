@@ -13,7 +13,7 @@ class Uninitialize:
                 print(f"Cannot uninitialize workspace from the directory : {folder_path}, workspace folder not found :(")
         # folder not empty
         except OSError as e:
-            Uninitialize.__delete_files(directory_path)
+            Uninitialize.__delete_files(folder_path)
             rmdir(folder_path)
             print(f"Uninitialized workspace from the directory : {folder_path}")
     

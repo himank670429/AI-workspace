@@ -1,5 +1,6 @@
 from os import path, mkdir, system
 import pickle
+from configparser import ConfigParser
 
 class Initialize:
 
@@ -34,13 +35,12 @@ class Initialize:
     
     def __inittialize_config(directory_path):
         file_name = "config.cfg"
+        config = ConfigParser()
+        config['DEFAULT'] = {'home' : path.dirname(directory_path)}
+
         try:
             with open(path.join(directory_path, file_name), "w") as config_file:
-                content = [
-                    f'home={directory_path}\n',
-                ]
-                config_file.writelines(content)
-                # pickle.dump(content, config_file)
+               config.write(config_file)
 
 
         except OSError as e:

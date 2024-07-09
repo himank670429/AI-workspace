@@ -2,9 +2,10 @@
 env/
 .env
 
-# test folder
-test/
+# sample folder
+sample/
 
 # python cache
 __pycache__/
 *.pyc
+cpp/
