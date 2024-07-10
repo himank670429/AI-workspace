@@ -1,4 +1,4 @@
-from os import path, getcwd, walk
+from os import path, getcwd, listdir
 import pickle
 from configparser import ConfigParser
 import re
@@ -9,19 +9,17 @@ class Summarize:
     def Parse():
         try:
             cur_dir = getcwd()
-            ignores = ['.workspace/', '.git/']
+            default_ignores = ['.workspace/', '.git/']
 
             config = ConfigParser()
             config.read(path.join(cur_dir, '.workspace/config.cfg'))
             homepath = config['DEFAULT'].get('home')
 
 
-            with open(path.join(cur_dir, '.workspace\\.workignore'), 'rb') as ignore_file, open(path.join(cur_dir, '.workspace','.files'), 'wb') as file_tree:
-                while True:
-                    try:
-                        ignores.append(pickle.load(ignore_file))
-                    except EOFError:
-                        break
+            with open(path.join(cur_dir, '.workspace\\.workignore'), 'r') as ignore_file, open(path.join(cur_dir, '.workspace','.files'), 'wb') as file_tree:
+                ignores = ignore_file.readlines()
+                ignores = [i.strip() for i in ignores]
+                ignores.extend(default_ignores)
                 
                 parsed_files = Summarize.__get_file_names(cur_dir, ignores)
                 pickle.dump(parsed_files, file_tree)
@@ -34,7 +32,7 @@ class Summarize:
 
 
 
-    def __get_file_names(folder_path, ignores):
+    def __get_file_names(folder_path, ignores, prefix=''):
         """
         Parses a folder and its subfolders, returning a list of relative file paths.
 
@@ -46,17 +44,16 @@ class Summarize:
         """
 
 
+        if path.isfile(folder_path) and not Summarize.__should_ignore(ignores, folder_path):
+            return [prefix]
+
         files = []
-        prefix_path_len = len(folder_path)
-        for root, _, files_in_folder in walk(folder_path):
-            relative_path_base = path.relpath(root, folder_path)
+        files_to_traverse = listdir(folder_path) if path.isdir(folder_path) else []
+        for i in files_to_traverse:
+            if Summarize.__should_ignore(ignores, path.join(folder_path, i)):
+                continue
 
-            for filename in files_in_folder:
-                relative_path = path.join(root, filename)[prefix_path_len+1:]
-                    
-                if (not Summarize.__should_ignore(ignores, relative_path)):
-                    files.append(relative_path)
-
+            files.extend(Summarize.__get_file_names(path.join(folder_path, i), ignores ,prefix=path.join(prefix, i)))        
         return files
     
     def __should_ignore(ignores, file_path):

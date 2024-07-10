@@ -1,5 +1,5 @@
 import unittest
-from os import walk, path
+from os import walk, path, listdir
 import re
 
 def should_ignore(ignores : list[str], file_path : str):
@@ -36,7 +36,7 @@ def should_ignore(ignores : list[str], file_path : str):
     return False
 
 
-def get_file_names(folder_path, ignores):
+def get_file_names(folder_path, ignores, prefix=''):
     """
     Parses a folder and its subfolders, returning a list of relative file paths.
 
@@ -47,7 +47,19 @@ def get_file_names(folder_path, ignores):
         A list containing the relative paths of all files within the folder structure.
     """
 
+    if path.isfile(folder_path) and not should_ignore(ignores, folder_path):
+        return [prefix]
 
+    files = []
+    files_to_traverse = listdir(folder_path) if path.isdir(folder_path) else []
+    for i in files_to_traverse:
+        if should_ignore(ignores, path.join(folder_path, i)):
+            continue
+
+        files.extend(get_file_names(path.join(folder_path, i), ignores ,prefix=path.join(prefix, i)))    
+    return files
+    
+def get_file_names_2(folder_path, ignores):
     files = []
     prefix_path_len = len(folder_path)
     for root, _, files_in_folder in walk(folder_path):
@@ -55,11 +67,20 @@ def get_file_names(folder_path, ignores):
 
         for filename in files_in_folder:
             relative_path = path.join(root, filename)[prefix_path_len+1:]
-                
             if (not should_ignore(ignores, relative_path)):
                 files.append(relative_path)
 
     return files
+
+
+    # for root, _, files_in_folder in walk(folder_path):
+    #     relative_path_base = path.relpath(root, folder_path)
+
+    #     for filename in files_in_folder:
+    #         relative_path = path.join(root, filename)[prefix_path_len+1:]
+                
+    #         if (not should_ignore(ignores, relative_path)):
+    #             files.append(relative_path)
 
 
 
@@ -128,7 +149,6 @@ class testSummarize(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    # ignores = [".env", "node_modules/","libs/", "*.json"]
     # result = get_file_names('D:\\workspace\\python\\holiday-game-jam',[
     #         "myenv/",
     #         "__pycache__/",
