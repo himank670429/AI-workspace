@@ -6,7 +6,7 @@ GENERATION_CONFIG = {
   "response_mime_type": "text/plain",
 }
 
-MODEL_NAME="gemini-1.5-flash",
+MODEL_NAME="gemini-1.5-flash"
 
 SAFETY_SETTINGS = [
   {

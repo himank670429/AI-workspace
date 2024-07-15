@@ -1,10 +1,19 @@
 import click
-from os import getcwd
+from os import getcwd, environ
 
 from scripts.initialize import Initialize
 from scripts.unintialize import Uninitialize
 from scripts.ignore import Ignore
 from scripts.summarize import Summarize
+from scripts.chat import Chat
+
+from dotenv import load_dotenv
+load_dotenv()
+
+from config import GENERATION_CONFIG, MODEL_NAME, SAFETY_SETTINGS
+
+import colorama 
+colorama.init(autoreset=True)
 
 @click.group
 def main():
@@ -48,7 +57,14 @@ def parse():
     Summarize.Parse()
 
 
-
+@click.command()
+def chat():
+    Chat.start_chat_session(
+        GENERATION_CONFIG, 
+        MODEL_NAME, 
+        SAFETY_SETTINGS,
+        environ.get("GEMENI_API_KEY")
+    )
 
 # Ingore commands
 @click.command()
@@ -95,6 +111,7 @@ main.add_command(init)
 main.add_command(uninit)
 main.add_command(ignore)
 main.add_command(parse)
+main.add_command(chat, name="start-chat")
 
 if __name__ == "__main__":
     main()

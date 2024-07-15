@@ -30,8 +30,6 @@ class Summarize:
         except FileNotFoundError as e:
             print("FileNotFound: workspace not initialized :(")
 
-
-
     def __get_file_names(folder_path, ignores, prefix=''):
         """
         Parses a folder and its subfolders, returning a list of relative file paths.
